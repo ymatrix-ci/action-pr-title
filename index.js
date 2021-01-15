@@ -42,21 +42,21 @@ async function run() {
         // Check if title pass regex
         const regex = RegExp(core.getInput('regex'));
         if (!regex.test(title)) {
-            core.setFailed(`Pull Request title "${title}" failed to pass match regex - ${regex}`);
+            core.setOutput('matched', 'false');
             return
         }
 
         // Check min length
         const minLen = parseInt(core.getInput('min_length'));
         if (title.length < minLen) {
-            core.setFailed(`Pull Request title "${title}" is smaller than min length specified - ${minLen}`);
+            core.setOutput('matched', 'false');
             return
         }
 
         // Check max length
         const maxLen = parseInt(core.getInput('max_length'));
         if (maxLen > 0 && title.length > maxLen) {
-            core.setFailed(`Pull Request title "${title}" is greater than max length specified - ${maxLen}`);
+            core.setOutput('matched', 'false');
             return
         }
 
@@ -65,7 +65,7 @@ async function run() {
         const prefixCaseSensitive = (core.getInput('prefix_case_sensitive') === 'true');
         core.info(`Allowed Prefixes: ${prefixes}`);
         if (prefixes.length > 0 && !prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
-            core.setFailed(`Pull Request title "${title}" did not match any of the prefixes - ${prefixes}`);
+            core.setOutput('matched', 'false');
             return
         }
 
@@ -73,9 +73,16 @@ async function run() {
         prefixes = core.getInput('disallowed_prefixes');
         core.info(`Disallowed Prefixes: ${prefixes}`);
         if (prefixes.length > 0 && prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
-            core.setFailed(`Pull Request title "${title}" matched with a disallowed prefix - ${prefixes}`);
+            core.info(`Disallowed prefixes detected`);
+            core.setOutput('matched', 'true');
+            return
+        } else {
+            core.info(`Disallowed prefixes passed`);
+            core.setOutput('matched', 'false');
             return
         }
+
+        core.setOutput('matched', 'true');
 
     } catch (error) {
         core.setFailed(error.message);
