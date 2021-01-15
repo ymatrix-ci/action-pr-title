@@ -77,6 +77,15 @@ async function run() {
             return
         }
 
+        // Check if title should skip workflow run
+        prefixes = core.getInput('prefixes_to_skip');
+        core.info(`Skipping Prefixes: ${prefixes}`);
+        if (prefixes.length > 0 && prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
+            core.info(`Pull Request title "${title}" matched with a skipping prefix - ${prefixes}`);
+            core.setOutput('matched', 'false');
+            return
+        }
+
     } catch (error) {
         core.setFailed(error.message);
     }

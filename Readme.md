@@ -14,6 +14,7 @@ steps:
     regex: '([a-z])+\/([a-z])+' # Regex the title should match.
     allowed_prefixes: 'feature,fix,JIRA' # title should start with the given prefix
     disallowed_prefixes: 'feat/,hotfix' # title should not start with the given prefix
+    prefixes_to_skip: 'wip,rfc' # title to skip this workflow with the given prefix
     prefix_case_sensitive: false # title prefix are case insensitive
     min_length: 5 # Min length of the title
     max_length: 20 # Max length of the title
